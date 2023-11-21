@@ -1,3 +1,5 @@
+import socket
+
 from grpc_tools import protoc
 
 protoc.main((
@@ -15,3 +17,5 @@ protoc.main((
     '--grpc_python_out=.',
     './central_key_value_store.proto',
 ))
+
+print("Nome completo da maquina: ", socket.getfqdn())

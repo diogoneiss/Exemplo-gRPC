@@ -3,6 +3,7 @@ from concurrent import futures
 import central_key_value_store_pb2
 import central_key_value_store_pb2_grpc
 import sys
+from common import show_debug_messages, fix_address
 
 
 class CentralKeyValueStoreServicer(central_key_value_store_pb2_grpc.CentralKeyValueStoreServicer):
@@ -15,9 +16,9 @@ class CentralKeyValueStoreServicer(central_key_value_store_pb2_grpc.CentralKeyVa
         for key in request.keys:
             self.key_directory[key] = identifier
             count += 1
-
-        print("Todas as chaves armazenadas e identificadores: ")
-        print(self.key_directory)
+        if show_debug_messages:
+            print("Todas as chaves armazenadas e identificadores: ")
+            print(self.key_directory)
         return central_key_value_store_pb2.Response(result=count)
 
     def MapKey(self, request, context):
@@ -31,7 +32,8 @@ class CentralKeyValueStoreServicer(central_key_value_store_pb2_grpc.CentralKeyVa
 
 
 def serve(port):
-    print("Starting central server at port ", port)
+    if show_debug_messages or True :
+        print("Starting central server at address ", fix_address(port))
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     servicer = CentralKeyValueStoreServicer()
     central_key_value_store_pb2_grpc.add_CentralKeyValueStoreServicer_to_server(servicer, server)

@@ -1,8 +1,10 @@
 import sys
+import socket
 
 import grpc
 import key_value_store_pb2
 import key_value_store_pb2_grpc
+from common import fix_address, show_debug_messages
 
 
 def main():
@@ -11,6 +13,7 @@ def main():
         sys.exit(1)
 
     server_address = sys.argv[1]
+    server_address = fix_address(server_address)
 
     try:
         with grpc.insecure_channel(server_address) as channel:
@@ -26,8 +29,9 @@ def main():
             # Loop para ler comandos da entrada padrão
             while True:
                 try:
-                    command = input("Digite um comando (I, C, A, T) ou 'sair' para encerrar: ")
-                    if command.lower() == 'sair':
+                    input_prompt = "Digite um comando (I, C, A, T) ou 'sair' para encerrar: " if show_debug_messages else ""
+                    command = input(input_prompt)
+                    if command.lower() == 'sair' or command == '':
                         break
 
                     process_command(command, stub)
@@ -68,6 +72,9 @@ def process_command(command: str, stub):
             print("Formato inválido para ativação. Use: A,identificador_do_serviço")
             return
         service_identifier = parts[1].strip()
+
+        service_identifier = fix_address(service_identifier)
+
         activate(service_identifier, stub)
     elif cmd_type == 'T':
         # Término
@@ -76,22 +83,34 @@ def process_command(command: str, stub):
 
 def insert(key, value, stub):
     response = stub.Insert(key_value_store_pb2.KeyValue(key=key, value=value))
-    print("Resposta do servidor:", response.result)
+    if show_debug_messages:
+        print("Resposta do servidor:", response.result)
+    else:
+        print(response.result)
 
 
 def query(key, stub):
     response = stub.Query(key_value_store_pb2.Key(key=key))
-    print("Valor:", response.value)
+    if show_debug_messages:
+        print("Valor:", response.value)
+    else:
+        print(response.value)
 
 
 def activate(service_identifier, stub):
     response = stub.Activate(key_value_store_pb2.ServiceIdentifier(identifier=service_identifier))
-    print("Resposta do servidor:", response.result)
+    if show_debug_messages:
+        print("Resposta do servidor:", response.result)
+    else:
+        print(response.result)
 
 
 def terminate(stub):
     response = stub.Terminate(key_value_store_pb2.Empty())
-    print("Resposta do servidor:", response.result)
+    if show_debug_messages:
+        print("Resposta do servidor:", response.result)
+    else:
+        print(response.result)
 
 
 if __name__ == '__main__':

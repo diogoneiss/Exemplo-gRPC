@@ -4,11 +4,16 @@ import socket
 
 import grpc
 from concurrent import futures
+
+from grpc_reflection.v1alpha import reflection
+
 import key_value_store_pb2
 import key_value_store_pb2_grpc
 import central_key_value_store_pb2
 import central_key_value_store_pb2_grpc
 import threading
+
+from common import fix_address, show_debug_messages
 
 
 class KeyValueStoreServicer(key_value_store_pb2_grpc.KeyValueStoreServicer):
@@ -20,6 +25,9 @@ class KeyValueStoreServicer(key_value_store_pb2_grpc.KeyValueStoreServicer):
     def Activate(self, request, context):
         if self.flag_ativacao:
             central_server_address = request.identifier
+            # Se apenas uma porta for providenciada, usar endereco do computador atual
+            central_server_address = fix_address(central_server_address)
+
             try:
                 # Conectar ao servidor central
                 with grpc.insecure_channel(central_server_address) as channel:
@@ -27,8 +35,9 @@ class KeyValueStoreServicer(key_value_store_pb2_grpc.KeyValueStoreServicer):
 
                     # Registrar as chaves no servidor central
                     keys = list(self.data_store.keys())
+                    current_address = fix_address(port)
                     response = central_stub.Register(central_key_value_store_pb2.ServerKeys(
-                        identifier=socket.getfqdn() + ":" + str(port),
+                        identifier=current_address,
                         keys=keys
                     ))
                     return key_value_store_pb2.Response(result=response.result)
@@ -50,8 +59,9 @@ class KeyValueStoreServicer(key_value_store_pb2_grpc.KeyValueStoreServicer):
     def Query(self, request, context):
         chave = request.key
         valor = self.data_store.get(chave, "")
-        print("Todos os valores: ")
-        print(self.data_store)
+        if show_debug_messages:
+            print("Todos os valores: ")
+            print(self.data_store)
         return key_value_store_pb2.ValueResponse(value=valor)
 
     def Terminate(self, request, context):
@@ -64,16 +74,25 @@ def serve(port, flag_ativacao=None):
     servicer = KeyValueStoreServicer(flag_ativacao)
     key_value_store_pb2_grpc.add_KeyValueStoreServicer_to_server(servicer, server)
 
+    # Habilitar Reflection
+    service_names = (
+        key_value_store_pb2.DESCRIPTOR.services_by_name['KeyValueStore'].full_name,
+        reflection.SERVICE_NAME,
+    )
+    reflection.enable_server_reflection(service_names, server)
+
     server.add_insecure_port(f'[::]:{port}')
     server.start()
-    print(f"Servidor iniciado na porta {port}")
+    if show_debug_messages:
+        print(f"Servidor iniciado na porta {port}")
 
     try:
         while not servicer.server_stop_event.is_set():
             time.sleep(1)
     except KeyboardInterrupt:
         server.stop(0)
-        print("Servidor interrompido")
+        if show_debug_messages:
+            print("Servidor interrompido")
 
 
 if __name__ == '__main__':
