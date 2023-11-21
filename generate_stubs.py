@@ -18,4 +18,4 @@ protoc.main((
     './central_key_value_store.proto',
 ))
 
-print("Nome completo da maquina: ", socket.getfqdn())
+#print("Nome completo da maquina: ", socket.getfqdn())

@@ -1,11 +1,8 @@
 import sys
 import time
-import socket
 
 import grpc
 from concurrent import futures
-
-from grpc_reflection.v1alpha import reflection
 
 import key_value_store_pb2
 import key_value_store_pb2_grpc
@@ -14,7 +11,6 @@ import central_key_value_store_pb2_grpc
 import threading
 
 from common import fix_address, show_debug_messages
-
 
 class KeyValueStoreServicer(key_value_store_pb2_grpc.KeyValueStoreServicer):
     def __init__(self, flag_ativacao=None):
@@ -73,13 +69,6 @@ def serve(port, flag_ativacao=None):
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     servicer = KeyValueStoreServicer(flag_ativacao)
     key_value_store_pb2_grpc.add_KeyValueStoreServicer_to_server(servicer, server)
-
-    # Habilitar Reflection
-    service_names = (
-        key_value_store_pb2.DESCRIPTOR.services_by_name['KeyValueStore'].full_name,
-        reflection.SERVICE_NAME,
-    )
-    reflection.enable_server_reflection(service_names, server)
 
     server.add_insecure_port(f'[::]:{port}')
     server.start()
