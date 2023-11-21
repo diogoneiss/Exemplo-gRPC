@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package centralkeyvaluestore;
+
+// Define um serviço para o servidor centralizador
+service CentralKeyValueStore {
+    // Método para registrar as chaves de um servidor de pares
+    rpc Register(ServerKeys) returns (Response) {}
+
+    // Método para mapear uma chave para um servidor
+    rpc MapKey(Key) returns (ServiceIdentifier) {}
+
+    // Método para terminar a execução do servidor centralizador
+    rpc Terminate(Empty) returns (Response) {}
+}
+
+// Mensagem para registrar chaves de um servidor
+message ServerKeys {
+    string identifier = 1;
+    repeated int32 keys = 2;
+}
+
+// Mensagem vazia para o método Terminate
+message Empty {}
+
+// Mensagem para resposta comum
+message Response {
+    int32 result = 1;
+}
+
+// Mensagem para consultar um valor
+message Key {
+    int32 key = 1;
+}
+
+// Mensagem para ativação do servidor
+message ServiceIdentifier {
+    string identifier = 1;
+}

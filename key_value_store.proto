@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+package keyvaluestore;
+
+// Define um serviço para armazenamento de pares chave-valor
+service KeyValueStore {
+    // Método para inserir um par chave-valor
+    rpc Insert(KeyValue) returns (Response) {}
+
+    // Método para consultar um valor com base na chave
+    rpc Query(Key) returns (ValueResponse) {}
+
+    // Método para ativar o servidor com um identificador de serviço específico
+    rpc Activate(ServiceIdentifier) returns (Response) {}
+
+    // Método para terminar a execução do servidor
+    rpc Terminate(Empty) returns (Response) {}
+}
+
+// Mensagem para inserção de pares chave-valor
+message KeyValue {
+    int32 key = 1;
+    string value = 2;
+}
+
+// Mensagem para consultar um valor
+message Key {
+    int32 key = 1;
+}
+
+// Mensagem para resposta comum
+message Response {
+    int32 result = 1;
+}
+
+// Mensagem para resposta de consulta de valor
+message ValueResponse {
+    string value = 1;
+}
+
+// Mensagem para ativação do servidor
+message ServiceIdentifier {
+    string identifier = 1;
+}
+
+// Mensagem vazia para o método Terminate
+message Empty {}
