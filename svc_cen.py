@@ -1,3 +1,5 @@
+# Feito por Diogo Oliveira Neiss 2021421915
+
 import grpc
 from concurrent import futures
 import central_key_value_store_pb2
@@ -32,12 +34,12 @@ class CentralKeyValueStoreServicer(central_key_value_store_pb2_grpc.CentralKeyVa
 
 
 def serve(port):
-    if show_debug_messages or True :
+    if show_debug_messages:
         print("Starting central server at address ", fix_address(port))
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     servicer = CentralKeyValueStoreServicer()
     central_key_value_store_pb2_grpc.add_CentralKeyValueStoreServicer_to_server(servicer, server)
-    server.add_insecure_port(f'[::]:{port}')
+    server.add_insecure_port(f'0.0.0.0:{port}')
     server.start()
     server.wait_for_termination()
 

@@ -2,7 +2,6 @@ syntax = "proto3";
 
 package centralkeyvaluestore;
 
-// Define um serviço para o servidor centralizador
 service CentralKeyValueStore {
     // Método para registrar as chaves de um servidor de pares
     rpc Register(ServerKeys) returns (Response) {}

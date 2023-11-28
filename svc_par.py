@@ -1,3 +1,6 @@
+# Feito por Diogo Oliveira Neiss 2021421915
+
+
 import sys
 import time
 
@@ -70,7 +73,7 @@ def serve(port, flag_ativacao=None):
     servicer = KeyValueStoreServicer(flag_ativacao)
     key_value_store_pb2_grpc.add_KeyValueStoreServicer_to_server(servicer, server)
 
-    server.add_insecure_port(f'[::]:{port}')
+    server.add_insecure_port(f'0.0.0.0:{port}')
     server.start()
     if show_debug_messages:
         print(f"Servidor iniciado na porta {port}")

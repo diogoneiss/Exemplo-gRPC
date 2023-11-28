@@ -1,6 +1,6 @@
-# Makefile para o exercício de armazenamento chave-valor distribuído
+# Feito por Diogo Oliveira Neiss 2021421915
 
-.PHONY: clean stubs run_serv_pares_50051
+.PHONY: clean stubs
 
 stubs:
 	@python3 generate_stubs.py

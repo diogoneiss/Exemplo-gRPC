@@ -2,7 +2,6 @@ syntax = "proto3";
 
 package keyvaluestore;
 
-// Define um serviço para armazenamento de pares chave-valor
 service KeyValueStore {
     // Método para inserir um par chave-valor
     rpc Insert(KeyValue) returns (Response) {}

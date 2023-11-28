@@ -2,8 +2,8 @@ import socket
 
 from grpc_tools import protoc
 
-# invés de chamar tudo no makefile, optei por abstrair as regras para um arquivo separado, se desejado tratar erros essa abordagem
-# funciona melhor
+# o protoc as vezes deu problema nos ambientes que testei (mesmo com o grpcio-tools instalado) entao para garantir
+# que funcione independente de PATH, vamos chamar o protoc diretamente do python
 
 protoc.main((
     '',

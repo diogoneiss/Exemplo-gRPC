@@ -1,6 +1,6 @@
-import sys
-import socket
+# Feito por Diogo Oliveira Neiss 2021421915
 
+import sys
 import grpc
 import key_value_store_pb2
 import key_value_store_pb2_grpc
