@@ -21,7 +21,7 @@ class KeyValueStoreServicer(key_value_store_pb2_grpc.KeyValueStoreServicer):
     def Activate(self, request, context):
         if self.flag_ativacao:
             central_server_address = request.identifier
-            # Se apenas uma porta for providenciada, usar endereco do computador atual
+            # Se apenas a porta for providenciada, usar endereco do computador atual
             central_server_address = fix_address(central_server_address)
 
             try:
@@ -29,7 +29,7 @@ class KeyValueStoreServicer(key_value_store_pb2_grpc.KeyValueStoreServicer):
                 with grpc.insecure_channel(central_server_address) as channel:
                     central_stub = central_key_value_store_pb2_grpc.CentralKeyValueStoreStub(channel)
 
-                    # Registrar as chaves no servidor central
+                    # Registrar as chaves no servidor central enviando a lista de chaves armazenadas
                     keys = list(self.data_store.keys())
                     current_address = fix_address(port)
                     response = central_stub.Register(central_key_value_store_pb2.ServerKeys(
@@ -56,7 +56,7 @@ class KeyValueStoreServicer(key_value_store_pb2_grpc.KeyValueStoreServicer):
         chave = request.key
         valor = self.data_store.get(chave, "")
         if show_debug_messages:
-            print("Todos os valores: ")
+            print("Consulta chamada. Todos os valores atualmente armazenados: ")
             print(self.data_store)
         return key_value_store_pb2.ValueResponse(value=valor)
 

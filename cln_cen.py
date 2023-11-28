@@ -31,18 +31,21 @@ def main():
                 try:
                     input_prompt = "Digite um comando (C,ch ou T) ou 'sair' para encerrar: " if show_debug_messages else ""
                     command = input(input_prompt)
+
                     if command.lower() == 'sair' or command == '':
                         break
 
                     process_command(command, stub)
-                except KeyboardInterrupt:
+                # Interrupção do teclado ou fim do arquivo redirecionado do stdin encerram o cliente
+                except (KeyboardInterrupt, EOFError):
                     break
+
     except grpc.RpcError as e:
         print(f"Erro de RPC ao tentar conectar: {e}")
         sys.exit(1)
 
 def process_command(command, stub):
-    parts = command.split(',')
+    parts = command.split(',', maxsplit=2)
 
     if len(parts) == 0:
         return
@@ -59,6 +62,7 @@ def process_command(command, stub):
     elif cmd_type == 'T':
         # Término
         terminate(stub)
+        sys.exit(0)
 
 
 def map_key(key, central_stub):

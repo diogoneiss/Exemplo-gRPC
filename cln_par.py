@@ -31,11 +31,13 @@ def main():
                 try:
                     input_prompt = "Digite um comando (I, C, A, T) ou 'sair' para encerrar: " if show_debug_messages else ""
                     command = input(input_prompt)
+
                     if command.lower() == 'sair' or command == '':
                         break
 
                     process_command(command, stub)
-                except KeyboardInterrupt:
+                # Interrupção do teclado ou fim do arquivo redirecionado do stdin encerram o cliente
+                except (KeyboardInterrupt, EOFError):
                     break
     except grpc.RpcError as e:
         print(f"Erro de RPC ao tentar conectar: {e}")
@@ -43,7 +45,7 @@ def main():
 
 
 def process_command(command: str, stub):
-    parts = command.split(',')
+    parts = command.split(',', maxsplit=2)
     # Evitar erros de acesso ao array
     if len(parts) == 0:
         return
@@ -71,14 +73,15 @@ def process_command(command: str, stub):
         if len(parts) != 2:
             print("Formato inválido para ativação. Use: A,identificador_do_serviço")
             return
-        service_identifier = parts[1].strip()
 
+        service_identifier = parts[1].strip()
         service_identifier = fix_address(service_identifier)
 
         activate(service_identifier, stub)
     elif cmd_type == 'T':
         # Término
         terminate(stub)
+        sys.exit(0)
 
 
 def insert(key, value, stub):

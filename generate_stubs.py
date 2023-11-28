@@ -2,6 +2,9 @@ import socket
 
 from grpc_tools import protoc
 
+# invés de chamar tudo no makefile, optei por abstrair as regras para um arquivo separado, se desejado tratar erros essa abordagem
+# funciona melhor
+
 protoc.main((
     '',
     '-I.',
